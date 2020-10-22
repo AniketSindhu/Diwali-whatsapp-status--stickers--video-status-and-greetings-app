@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -73,11 +74,90 @@ class _HomepageState extends State<Homepage> {
                 }
               );
             }
-            else 
+            else if(index==2){
+              return ListView.builder(
+                itemCount:snapshot.data.documents[0].data()['images'].length,
+                itemBuilder: (context,ind){
+                  return ImageWidget(url: snapshot.data.documents[0].data()['images'][ind],);
+                },
+              );
+            }
+            else
               return Container(child: Text('to be done'),);
           }
         } ,
       ),
+    );
+  }
+}
+
+class ImageWidget extends StatelessWidget {
+  final String url;
+  const ImageWidget({
+    Key key,this.url
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding:EdgeInsets.all(10),
+      child:SizedBox(
+        height:350,
+        child: Column(
+          children: [
+            Expanded(
+              child: CachedNetworkImage(
+                imageUrl: url,
+                imageBuilder: (context, imageProvider) => Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment:Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('Downloaded From Diwali bonanza',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600),),
+                      )
+                    )
+                  ],
+                ),
+                placeholder:(context,s){
+                  return Card(
+                    color:Colors.purple,
+                    child: Container(height: 300,child: Center(child:CircularProgressIndicator()),),
+                  );
+                },
+              ),
+            ),
+            Container(
+              height: 60,
+              color: Colors.purple,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  RaisedButton(
+                    child: Text('Download',style: TextStyle(color:Colors.white,)),
+                    onPressed: (){},
+                    color: Colors.amber,
+                  ),
+                  SizedBox(width:20),
+                  RaisedButton(
+                    child: Text('Download without watermark',style: TextStyle(color:Colors.white,)),
+                    onPressed: (){},
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      )
     );
   }
 }
@@ -125,13 +205,6 @@ class TextStatus extends StatelessWidget {
                            });
                         },                    
                       ),
-                      SizedBox(width:10),
-                      RaisedButton(
-                        onPressed:(){},
-                        child:Text("Add background",style: TextStyle(color: Colors.white),),
-                        elevation: 10,
-                        color:Colors.deepPurple
-                      )
                     ]
                   )
                 ],
@@ -143,3 +216,4 @@ class TextStatus extends StatelessWidget {
     );
   }
 }
+

@@ -38,6 +38,7 @@ dependencies:
   random_color: ^1.0.5
   share: ^0.6.5+3
   clipboard: ^0.1.2+8
+  image_downloader: ^0.20.1
   
 dev_dependencies:
   flutter_test:
