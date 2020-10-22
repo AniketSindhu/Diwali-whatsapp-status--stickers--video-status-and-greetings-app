@@ -39,6 +39,7 @@ dependencies:
   share: ^0.6.5+3
   clipboard: ^0.1.2+8
   image_downloader: ^0.20.1
+  image_gallery_saver: '^1.6.0'
   
 dev_dependencies:
   flutter_test:

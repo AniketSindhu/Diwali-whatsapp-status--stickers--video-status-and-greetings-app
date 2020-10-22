@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_downloader/image_downloader.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:random_color/random_color.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 
 
@@ -34,7 +39,8 @@ class _HomepageState extends State<Homepage> {
           BottomNavigationBarItem(icon: Icon(Icons.textsms),label:'English Status',),
           BottomNavigationBarItem(icon: Icon(Icons.language),label:'Hindi Status',),
           BottomNavigationBarItem(icon: Icon(Icons.image),label:'Images',),
-          BottomNavigationBarItem(icon: Icon(Icons.emoji_emotions),label:'Stickers',),
+          BottomNavigationBarItem(icon: Icon(Icons.music_note),label:'Aarti',),
+          BottomNavigationBarItem(icon: Icon(Icons.design_services_rounded),label:'Rangoli',),
           BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_rounded),label:'Wishes',),
         ],
       ),
@@ -93,10 +99,12 @@ class _HomepageState extends State<Homepage> {
 
 class ImageWidget extends StatelessWidget {
   final String url;
-  const ImageWidget({
-    Key key,this.url
-  }) : super(key: key);
-
+  
+  ImageWidget({
+    this.url
+  });
+  
+  final ScreenshotController screenshotController = ScreenshotController(); 
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -106,33 +114,36 @@ class ImageWidget extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: CachedNetworkImage(
-                imageUrl: url,
-                imageBuilder: (context, imageProvider) => Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
+              child: Screenshot(
+                controller: screenshotController,
+                child: CachedNetworkImage(
+                  imageUrl: url,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                          ),
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment:Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('Downloaded From Diwali bonanza',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600),),
+                      Align(
+                        alignment:Alignment.bottomRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('Downloaded From Diwali greetings',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600),),
+                        )
                       )
-                    )
-                  ],
+                    ],
+                  ),
+                  placeholder:(context,s){
+                    return Card(
+                      color:Colors.purple,
+                      child: Container(height: 300,child: Center(child:CircularProgressIndicator()),),
+                    );
+                  },
                 ),
-                placeholder:(context,s){
-                  return Card(
-                    color:Colors.purple,
-                    child: Container(height: 300,child: Center(child:CircularProgressIndicator()),),
-                  );
-                },
               ),
             ),
             Container(
@@ -143,13 +154,26 @@ class ImageWidget extends StatelessWidget {
                 children: [
                   RaisedButton(
                     child: Text('Download',style: TextStyle(color:Colors.white,)),
-                    onPressed: (){},
+                    onPressed: (){
+                      screenshotController
+                          .capture()
+                          .then((File image) async {
+                            final result =
+                              await ImageGallerySaver.saveImage(image.readAsBytesSync()); 
+                          Fluttertoast.showToast(msg: 'Image saved',gravity:ToastGravity.TOP,textColor:Colors.white,backgroundColor:Colors.green);
+                        });
+                    },
                     color: Colors.amber,
                   ),
                   SizedBox(width:20),
                   RaisedButton(
                     child: Text('Download without watermark',style: TextStyle(color:Colors.white,)),
-                    onPressed: (){},
+                    onPressed: ()async{
+                      // FIRST SHOW REWARD AD
+                      await ImageDownloader.downloadImage("$url").then((value){
+                        Fluttertoast.showToast(msg: 'Image saved',gravity:ToastGravity.TOP,textColor:Colors.white,backgroundColor:Colors.green);
+                      });
+                    },
                     color: Colors.red,
                   ),
                 ],
