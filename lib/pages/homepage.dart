@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_downloader/image_downloader.dart';
@@ -11,6 +13,11 @@ import 'package:random_color/random_color.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 
+MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
+    keywords: <String>['Deepwali', 'Diwali'],
+    childDirected: false,
+    testDevices: <String>[], // Android emulators are considered test devices
+);
 
 class Homepage extends StatefulWidget {
   @override
@@ -19,6 +26,43 @@ class Homepage extends StatefulWidget {
 
 class _HomepageState extends State<Homepage> {
   int index=0;
+  String aarti="ॐ जय लक्ष्मी माता, मैया जय लक्ष्मी माता\n\nतुमको निशदिन सेवत, मैया जी को निशदिन * सेवत हरि विष्णु विधात\n\nॐ जय लक्ष्मी माता-\n\nउमा, रमा, ब्रह्माणी, तुम ही जग-मात\n\nसूर्य-चन्द्रमा ध्यावत, नारद ऋषि गात\n\nॐ जय लक्ष्मी माता-\n\nदुर्गा रूप निरंजनी, सुख सम्पत्ति दात\n\nजो कोई तुमको ध्यावत, ऋद्धि-सिद्धि धन पात\n\nॐ जय लक्ष्मी माता-\n\nतुम पाताल-निवासिनि, तुम ही शुभदात\n\nकर्म-प्रभाव-प्रकाशिनी, भवनिधि की त्रात\n\nॐ जय लक्ष्मी माता-\n\nजिस घर में तुम रहतीं, सब सद्गुण आत\n\nसब सम्भव हो जाता, मन नहीं घबरात\n\nॐ जय लक्ष्मी माता-\n\nतुम बिन यज्ञ न होते, वस्त्र न कोई पात\n\nखान-पान का वैभव, सब तुमसे आत\n\nॐ जय लक्ष्मी माता-\n\nशुभ-गुण मन्दिर सुन्दर, क्षीरोदधि-जात\n\nरत्न चतुर्दश तुम बिन, कोई नहीं पात\n\nॐ जय लक्ष्मी माता-\n\nमहालक्ष्मीजी की आरती, जो कोई नर गात\n\nउर आनन्द समाता, पाप उतर जात\n\nॐ जय लक्ष्मी माता-\n\nॐ जय लक्ष्मी माता, मैया जय लक्ष्मी मात\n\nतुमको निशदिन सेवत\n\nमैया जी को निशदिन सेवत हरि विष्णु विधात\n\nॐ जय लक्ष्मी माता-2";
+  
+BannerAd myBanner = BannerAd(
+  adUnitId: BannerAd.testAdUnitId,
+  size: AdSize.smartBanner,
+  targetingInfo: targetingInfo,
+  listener: (MobileAdEvent event) {
+    print("BannerAd event is $event");
+  },
+);
+
+InterstitialAd myInterstitial = InterstitialAd(
+  adUnitId: InterstitialAd.testAdUnitId,
+  targetingInfo: targetingInfo,
+  listener: (MobileAdEvent event) {
+    print("InterstitialAd event is $event");
+  },
+);
+
+Timer timer;
+
+void initState(){
+  super.initState();
+  
+  myBanner..load()..show(
+    anchorOffset: 60.0,
+    horizontalCenterOffset: 10.0,
+    anchorType: AnchorType.bottom,
+  );
+
+  timer = Timer.periodic(Duration(seconds: 60), (Timer t) => myInterstitial..load()..show());   
+}
+
+void dispose(){
+  super.dispose();
+  timer?.cancel();
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +85,6 @@ class _HomepageState extends State<Homepage> {
           BottomNavigationBarItem(icon: Icon(Icons.image),label:'Images',),
           BottomNavigationBarItem(icon: Icon(Icons.music_note),label:'Aarti',),
           BottomNavigationBarItem(icon: Icon(Icons.design_services_rounded),label:'Rangoli',),
-          BottomNavigationBarItem(icon: Icon(Icons.card_giftcard_rounded),label:'Wishes',),
         ],
       ),
       appBar: AppBar(
@@ -80,12 +123,35 @@ class _HomepageState extends State<Homepage> {
                 }
               );
             }
-            else if(index==2){
+            else if(index==2||index==4){
               return ListView.builder(
-                itemCount:snapshot.data.documents[0].data()['images'].length,
+                itemCount:snapshot.data.documents[0].data()[index==2?'images':'rangoli'].length,
                 itemBuilder: (context,ind){
-                  return ImageWidget(url: snapshot.data.documents[0].data()['images'][ind],);
+                  return ImageWidget(url: snapshot.data.documents[0].data()[index==2?'images':'rangoli'][ind],);
                 },
+              );
+            }
+            else if(index==3){
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Image.asset('assets/aarti.jpg'),
+                        SizedBox(height:15),
+                        Card(
+                          color: Colors.red,
+                          elevation: 12,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(aarti,style: TextStyle(fontWeight: FontWeight.w600,fontSize: 22,color: Colors.white),textAlign: TextAlign.center,),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
               );
             }
             else
