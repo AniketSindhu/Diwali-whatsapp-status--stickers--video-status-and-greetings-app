@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,6 +18,33 @@ MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     testDevices: <String>[], // Android emulators are considered test devices
 );
 
+InterstitialAd interstitialAd;
+BannerAd bannerAd;
+
+InterstitialAd myInterstitial() {
+    return InterstitialAd(
+      adUnitId: 'ca-app-pub-8295782880270632/8126404478',
+      targetingInfo: targetingInfo,
+      listener: (MobileAdEvent event) {
+        if (event == MobileAdEvent.failedToLoad) {
+          interstitialAd..load();
+        } else if (event == MobileAdEvent.closed) {
+          interstitialAd = myInterstitial()..load();
+        }
+      },
+    );
+}
+
+BannerAd myBannerAd() {
+    return BannerAd(
+      adUnitId: 'ca-app-pub-8295782880270632/7164854204',
+      size: AdSize.smartBanner,
+      listener: (MobileAdEvent event) {
+        print('$event');
+    },
+  );
+}
+
 class Homepage extends StatefulWidget {
   @override
   _HomepageState createState() => _HomepageState();
@@ -28,43 +54,30 @@ class _HomepageState extends State<Homepage> {
   int index=0;
   String aarti="ॐ जय लक्ष्मी माता, मैया जय लक्ष्मी माता\n\nतुमको निशदिन सेवत, मैया जी को निशदिन * सेवत हरि विष्णु विधात\n\nॐ जय लक्ष्मी माता-\n\nउमा, रमा, ब्रह्माणी, तुम ही जग-मात\n\nसूर्य-चन्द्रमा ध्यावत, नारद ऋषि गात\n\nॐ जय लक्ष्मी माता-\n\nदुर्गा रूप निरंजनी, सुख सम्पत्ति दात\n\nजो कोई तुमको ध्यावत, ऋद्धि-सिद्धि धन पात\n\nॐ जय लक्ष्मी माता-\n\nतुम पाताल-निवासिनि, तुम ही शुभदात\n\nकर्म-प्रभाव-प्रकाशिनी, भवनिधि की त्रात\n\nॐ जय लक्ष्मी माता-\n\nजिस घर में तुम रहतीं, सब सद्गुण आत\n\nसब सम्भव हो जाता, मन नहीं घबरात\n\nॐ जय लक्ष्मी माता-\n\nतुम बिन यज्ञ न होते, वस्त्र न कोई पात\n\nखान-पान का वैभव, सब तुमसे आत\n\nॐ जय लक्ष्मी माता-\n\nशुभ-गुण मन्दिर सुन्दर, क्षीरोदधि-जात\n\nरत्न चतुर्दश तुम बिन, कोई नहीं पात\n\nॐ जय लक्ष्मी माता-\n\nमहालक्ष्मीजी की आरती, जो कोई नर गात\n\nउर आनन्द समाता, पाप उतर जात\n\nॐ जय लक्ष्मी माता-\n\nॐ जय लक्ष्मी माता, मैया जय लक्ष्मी मात\n\nतुमको निशदिन सेवत\n\nमैया जी को निशदिन सेवत हरि विष्णु विधात\n\nॐ जय लक्ष्मी माता-2";
   
-BannerAd myBanner = BannerAd(
-  adUnitId: BannerAd.testAdUnitId,
-  size: AdSize.smartBanner,
-  targetingInfo: targetingInfo,
-  listener: (MobileAdEvent event) {
-    print("BannerAd event is $event");
-  },
-);
+  Timer timer;
 
-InterstitialAd myInterstitial = InterstitialAd(
-  adUnitId: InterstitialAd.testAdUnitId,
-  targetingInfo: targetingInfo,
-  listener: (MobileAdEvent event) {
-    print("InterstitialAd event is $event");
-  },
-);
+  @override
+  void initState(){
+    super.initState();
+    FirebaseAdMob.instance.initialize(appId: 'ca-app-pub-8295782880270632~5628750562');
+    interstitialAd = myInterstitial()..load();
+    bannerAd=myBannerAd()..load();
+    timer=Timer.periodic(Duration(seconds: 25), (timer) {interstitialAd..load()..show();});       //intersetital ad every 25 seconds
+  }
+@override
+  void dispose(){
+    interstitialAd?.dispose();
+    timer?.cancel();
+    bannerAd.dispose();
+    super.dispose();
+  }
 
-Timer timer;
-
-void initState(){
-  super.initState();
-  
-  myBanner..load()..show(
-    anchorOffset: 60.0,
-    horizontalCenterOffset: 10.0,
-    anchorType: AnchorType.bottom,
-  );
-
-  timer = Timer.periodic(Duration(seconds: 60), (Timer t) => myInterstitial..load()..show());   
-}
-
-void dispose(){
-  super.dispose();
-  timer?.cancel();
-}
   @override
   Widget build(BuildContext context) {
+    bannerAd..load()..show(
+      anchorOffset: 30,
+      anchorType: AnchorType.top
+    );
     return Scaffold(
       backgroundColor: Colors.amber,
       bottomNavigationBar: BottomNavigationBar(
@@ -236,9 +249,14 @@ class ImageWidget extends StatelessWidget {
                     child: Text('Download without watermark',style: TextStyle(color:Colors.white,)),
                     onPressed: ()async{
                       // FIRST SHOW REWARD AD
-                      await ImageDownloader.downloadImage("$url").then((value){
-                        Fluttertoast.showToast(msg: 'Image saved',gravity:ToastGravity.TOP,textColor:Colors.white,backgroundColor:Colors.green);
+                      RewardedVideoAd.instance.listener= (RewardedVideoAdEvent event,{String rewardType, int rewardAmount}) async{
+                        if(event==RewardedVideoAdEvent.rewarded)
+                        await ImageDownloader.downloadImage("$url").then((value){
+                        Fluttertoast.showToast(msg: 'Image saved',gravity:ToastGravity.BOTTOM,textColor:Colors.white,backgroundColor:Colors.green);
                       });
+                      };
+                      RewardedVideoAd.instance.load(adUnitId: 'ca-app-pub-8295782880270632/4119054313').then((value) => RewardedVideoAd.instance.show());
+                      
                     },
                     color: Colors.red,
                   ),

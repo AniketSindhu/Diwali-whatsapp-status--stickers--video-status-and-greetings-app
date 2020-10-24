@@ -1,4 +1,4 @@
-package com.example.festive_app
+package com.aniketsindhu.diwali_status_app
 
 import io.flutter.embedding.android.FlutterActivity
 
