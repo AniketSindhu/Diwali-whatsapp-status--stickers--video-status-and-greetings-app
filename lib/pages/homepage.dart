@@ -14,8 +14,7 @@ import 'package:share/share.dart';
 
 MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     keywords: <String>['Deepwali', 'Diwali'],
-    childDirected: false,
-    testDevices: <String>[], // Android emulators are considered test devices
+    childDirected: false, // Android emulators are considered test devices
 );
 
 InterstitialAd interstitialAd;
