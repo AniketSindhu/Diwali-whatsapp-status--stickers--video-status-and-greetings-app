@@ -1,16 +1,24 @@
-# festive_app
+# Diwali festive app
 
-A new Flutter project.
+🤩 Whatsapp diwali status, greeting, images, rangoli designs, & Laxmi aarti🎊🤩.
 
-## Getting Started
+Made with flutter and firebase.
 
-This project is a starting point for a Flutter application.
+## Download App
+<a href="https://play.google.com/store/apps/details?id=com.aniketsindhu.diwali_status_app"><img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="200"></img></a>
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+English Status/ Wishes                |  Hindi Status/ Wishes              | Rangoli                |  Aarti
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![](https://github.com/AniketSindhu/Diwali-whatsapp-status--stickers--video-status-and-greetings-app/blob/master/ss/Screenshot_1603603460.png) |![](https://github.com/AniketSindhu/Diwali-whatsapp-status--stickers--video-status-and-greetings-app/blob/master/ss/Screenshot_1603603466.png)|![](https://github.com/AniketSindhu/Diwali-whatsapp-status--stickers--video-status-and-greetings-app/blob/master/ss/Screenshot_1603603490.png)|![](https://github.com/AniketSindhu/Diwali-whatsapp-status--stickers--video-status-and-greetings-app/blob/master/ss/Screenshot_1603603479.png)|
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Created & Maintained By
+
+[Aniket Sindhu](https://github.com/AniketSindhu) ([Twitter](https://www.twitter.com/aniketsindhu1))
+
+![Twitter Follow](https://img.shields.io/twitter/follow/aniketsindhu1?style=social) 
+
+## Visitors Count
+
+<img align="left" src = "https://profile-counter.glitch.me/Diwali-whatsapp-status--stickers--video-status-and-greetings-app/count.svg" alt ="Loading">
